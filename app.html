@@ -1,0 +1,92 @@
+<html>
+<head>
+    <title>Google Maps Datasets</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.1/css/bootstrap.min.css" integrity="sha512-6KY5s6UI5J7SVYuZB4S/CZMyPylqyyNZco376NM2Z8Sb8OxEdp02e1jkKk/wZxIEmjQ6DRCEBhni+gpr9c4tvA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
+    <link href="https://cdn.datatables.net/autofill/2.5.1/css/autoFill.bootstrap5.min.css">
+    <link href="https://cdn.datatables.net/buttons/2.3.3/css/buttons.bootstrap5.min.css">
+    <link href="https://cdn.datatables.net/responsive/2.4.0/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/lux/bootstrap.min.css" integrity="sha384-9+PGKSqjRdkeAU7Eu4nkJU8RFaH8ace8HGXnkiKMP9I9Te0GJ4/km3L1Z8tXigpG" crossorigin="anonymous">
+    
+    <style>
+table.dataTable tbody td {
+    word-break: break-word;
+    vertical-align: middle;
+}
+table.dataTable tbody td:nth-child(1),table.dataTable tbody td:nth-child(2){
+    width:20%;
+}
+.col-12 h1, .col-12 h6 {text-align: center; padding:10px;}
+#GoogleMapsDataset_wrapper {padding:30px;margin:0 auto;}
+table {width:100%; margin:0 auto;}
+
+    </style>
+</head>
+<body>
+
+    <div clas="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>Google Maps Datasets</h1>
+                <h6><a href='https://apify.com/compass/crawler-google-places' target="_blank">Crawler Google Maps</a></h6>
+            <table id="GoogleMapsDataset" class="table table-hovered table-responsive table-bordered">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Website</th>
+                    <th>Phone</th>
+                    <th>Category</th>
+                    <th>City</th>
+                    <th>State</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.2/js/bootstrap.min.js" integrity="sha512-a6ctI6w1kg3J4dSjknHj3aWLEbjitAXAjLDRUxo2wyYmDFRcz2RJuQr5M3Kt8O/TtUSp8n2rAyaXYy1sjoKmrQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/autofill/2.5.1/js/dataTables.autoFill.min.js"></script>
+    <script src="https://cdn.datatables.net/autofill/2.5.1/js/autoFill.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.3/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.colVis.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.4.0/js/dataTables.responsive.min.js"></script>
+
+    <script>
+    // Apify Actor Link: https://apify.com/compass/crawler-google-places
+    $(document).ready(function(){
+        var removedDatasets = ['dataset-name'];
+        var token = '';
+        $.get("https://api.apify.com/v2/datasets?desc=true&unnamed=true&token=" + token, function(datasets){
+            console.log(datasets.data.items);
+            var response = jQuery.grep(datasets.data.items, function(value) { return value.hasOwnProperty('name') && value.name != removedDatasets[0];});
+            console.log(response);
+            $.each(response, function(i,val){
+                console.log(val.id);
+                $.get("https://api.apify.com/v2/datasets/" + val.id + '/items', {token:token, format:'json', fields: 'categoryName,city,countryCode,phone,state,website,url,title'},function(dataset){
+                    $.each(dataset, function(iterator,value){
+                        var row = "<tr>" + '<td>' + value.title + '</td><td><a href="' + value.website + '" target="_blank">' + value.website + '</a></td><td><a href="tel:' + value.phone + '">' + value.phone +'</td><td>' + value.categoryName + '</td><td>' + value.city + '</td><td>' + value.state + '</td></tr>';
+                        $("#GoogleMapsDataset tbody").append(row);
+                    });//<td>'
+                });
+            });
+        }).done(function(){
+            setTimeout(function(){
+            $("#GoogleMapsDataset").DataTable();
+        }, 3000);
+        });
+
+
+    });
+</script>
+
+</body>
+</html>
